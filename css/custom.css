@@ -1,3 +1,12 @@
 .container{
     padding-top: 50px;
 }
+
+#player_name_navbar_dropdown {
+    color: white !important;
+    font-weight: 20px !important;
+}
+
+.center {
+    text-align: center;
+}

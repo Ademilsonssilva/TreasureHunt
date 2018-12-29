@@ -2,10 +2,11 @@ $(document).ready(function () {
 
     $('#btn_register').on('click', function () {
 
+        name = $('#name').val();
         email = $('#email').val();
         pass = $('#password').val();
 
-        if(email == '' || pass == '') {
+        if(email == '' || pass == '' || name == '') {
     
             swal({
                 title: 'Ops',
@@ -66,9 +67,12 @@ $(document).ready(function () {
             });
     
         });			
-    
 
     });
+
+    $('#btn_back').on('click', function () {
+        window.location.href = 'index.html';
+    })
 
 
 })

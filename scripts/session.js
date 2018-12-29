@@ -2,11 +2,18 @@ $(document).ready(function () {
 
     logged_user = '';
 
-    firebase.auth().onAuthStateChanged(function(user) {
+    fa.onAuthStateChanged(function(user) {
 		  
         if (user) {
 
             logged_user = firebase.auth().currentUser.uid;
+
+            fd.ref('player/'+logged_user).on('value', (data) => {
+
+                player = data.val();
+
+                $('#player_name_navbar_dropdown').html(player.name);
+            })
 
         } else {
          
@@ -23,6 +30,15 @@ $(document).ready(function () {
         }
 
     });
-})
+
+});
+
+function logout() {
+
+    fa.signOut().then( () => {
+        window.location.href = 'index.html';
+    })
+
+}
   
 	
