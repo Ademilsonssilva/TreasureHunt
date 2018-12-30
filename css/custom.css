@@ -10,3 +10,17 @@
 .center {
     text-align: center;
 }
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.btn-style-1 {
+    padding: 2px;
+    font-size: 10px;
+    margin: 0px 2px;
+}

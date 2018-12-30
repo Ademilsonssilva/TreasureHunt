@@ -1,50 +1,51 @@
 $(document).ready(() => {
 
-    fa.onAuthStateChanged(function(user) {
-        // Fetch the current user's ID from Firebase Authentication.
-        var uid = firebase.auth().currentUser.uid;
+    fd.ref('player').on('value', (players) => {
 
-        // Create a reference to this user's specific status node.
-        // This is where we will store data about being online/offline.
-        var userStatusDatabaseRef = firebase.database().ref('/status/' + uid);
+        pdiv = $('#players_div');
+        pdiv.html('');
 
-        // We'll create two constants which we will write to
-        // the Realtime database when this device is offline
-        // or online.
-        var isOfflineForDatabase = {
-            state: 'offline',
-            last_changed: firebase.database.ServerValue.TIMESTAMP,
-        };
+        players.forEach((player) => {
+        
+            if(player.key != logged_user) {
 
-        var isOnlineForDatabase = {
-            state: 'online',
-            last_changed: firebase.database.ServerValue.TIMESTAMP,
-        };
+                div = $(`<div class="home_player_row row" pid="${player.key}"></div>`);
 
-        // Create a reference to the special '.info/connected' path in
-        // Realtime Database. This path returns `true` when connected
-        // and `false` when disconnected.
-        firebase.database().ref('.info/connected').on('value', function(snapshot) {
-            // If we're not currently connected, don't do anything.
-            if (snapshot.val() == false) {
-                return;
-            };
+                col1 = $('<div class="col-7 left"> </div>');
+                col2 = $('<div class="col-5 right"> </div>');
 
-            // If we are currently connected, then use the 'onDisconnect()'
-            // method to add a set which will only trigger once this
-            // client has disconnected by closing the app,
-            // losing internet, or any other means.
-            userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function() {
-                // The promise returned from .onDisconnect().set() will
-                // resolve as soon as the server acknowledges the onDisconnect()
-                // request, NOT once we've actually disconnected:
-                // https://firebase.google.com/docs/reference/js/firebase.database.OnDisconnect
+                span = $(`<span class="home_player_span"> ${player.val().name} </span>`);
+                span.append(`<span class="status-${player.key}" style="color: red;">offline</span>`);
 
-                // We can now safely set ourselves as 'online' knowing that the
-                // server will mark us as offline once we lose connection.
-                userStatusDatabaseRef.set(isOnlineForDatabase);
-            });
+                invite_button = $(`<btn class="invite_button btn btn-sm btn-success btn-style-1"> Convidar </button>`);
+
+                accept_invite_button = $(`<btn class="accept_invite_button btn btn-sm btn-success btn-style-1"> Aceitar </button>`);
+                
+                col1.append(span);
+                col2.append(invite_button).append(accept_invite_button);
+
+                pdiv.append(div.append(col1).append(col2));
+
+                
+            }
+
+        })
+    })
+        
+    fd.ref('status/').on('value', (status) => {
+
+        status.forEach((playerState) => {
+            spanstate = $(`.status-${playerState.key}`);
+
+            state = playerState.val().state;
+
+            color = state == 'online' ? 'green' : 'red';
+
+            spanstate.html(state).css('color', color);
         });
-    });
+
+    })
+
+    
     
 });
