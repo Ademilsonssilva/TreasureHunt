@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    //$('#primary_color_div').html(getColorsSelector('primary_color'));
+
     $('#btn_register').on('click', function () {
 
         name = $('#name').val();

@@ -7,5 +7,6 @@ document.write(`
     <script src="scripts/connection.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.33.1/sweetalert2.all.min.js"></script>
     <script src="scripts/session_validation.js"></script>
+    <script src="scripts/utils.js"></script>
 
 `);
