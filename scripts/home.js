@@ -17,13 +17,7 @@ $(document).ready(() => {
             })
         }
         else if(target.hasClass('cancel_invite')) {
-            fd.ref('invites/'+target.attr('invite_key')).set({});
-
-            $('#'+id).addClass('invite_player');
-            $('#'+id).html('Convidar');
-            $('#'+id).removeAttr('invite_key');
-            $('#'+id).removeClass('cancel_invite');
-            
+            fd.ref('invites/'+target.attr('invite_key')).set({});            
         }
     });
 
@@ -72,16 +66,7 @@ $(document).ready(() => {
 
     fd.ref('invites/').on('value', (response) => {
 
-        $('.invite_status').each(() => {
-
-            $(this).removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite');
-            $(this).html('Convidar');
-            $(this).addClass('invite_player');
-            $(this).removeAttr('invite_key');
-
-        });
-
-        console.log(response.val());  
+        cleanButtons();
 
         response.forEach((invite) => {
 
@@ -107,18 +92,17 @@ $(document).ready(() => {
             }
         })
     })
-
-    /*fd.ref('invites/').on('value', (response) => {
-        response.forEach((invite) => {
-            if(invite.val().player == logged_user) {
-                invite_status = 'inviting';
-            }
-            else if (invite.val().invited == logged_user) {
-                invite_status = 'invited';
-            }
-        })
-    })*/
-
-    
     
 });
+
+function cleanButtons()
+{
+    jQuery('.invite_status').each(function () {
+
+        $(this).removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite');
+        $(this).html('Convidar');
+        $(this).addClass('invite_player');
+        $(this).removeAttr('invite_key');
+
+    });
+}
