@@ -20,8 +20,17 @@ $(document).ready(() => {
         }
         else if(target.hasClass('accept_invite')) {
             player_id = '';
+            invite_id = '';
             fd.ref('invites/'+target.attr('invite_key')).once('value', (response) => {
                 player_id = response.val().player;
+                invite_id = response.key;
+
+                fd.ref('games/'+target.attr('invite_key')).set({
+                    player1: response.val().player,
+                    player2: response.val().invited,
+                    gameStart: firebase.database.ServerValue.TIMESTAMP
+                });
+
             }).then(() => {
                 fd.ref('status/'+player_id).once('value', (response) => {
                     state = response.val().state;
@@ -32,16 +41,17 @@ $(document).ready(() => {
                     else {
                         fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'playing'});
                     }
+                }).then(() => {
+                    localStorage.setItem('th_active_game', invite_id);
+                    window.location.href = 'game.html';
                 })
             });
 
-            
-
-            //alert(player_id);
-            //
         }
         else if(target.hasClass('play_game')) {
-            swal('wow', 'Let the games begin', 'success');
+            invite_id = target.attr('invite_key');
+            localStorage.setItem('th_active_game', invite_id);
+            window.location.href = 'game.html';
         }
     });
 
@@ -112,12 +122,19 @@ $(document).ready(() => {
                 if(invite.val().invite_status == 'starting' && invite.val().player == logged_user)  {
                     fd.ref('player/'+invite.val().invited).once('value', (response) => {
                         swal({
-                            html: 'Oloco ' + response.val().name + ' aceitou!',
+                            html: response.val().name + ' aceitou o convite! Ir para o jogo?',
                             type: 'success',
-                            title: 'Oloco meu',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ir',
+                            cancelButtonText: 'Ficar',
+                        }).then( (result) => {
+                            fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'playing'}).then(() => {
+                                if(result.value) {
+                                    localStorage.setItem('th_active_game', invite.val().id);
+                                    window.location.href = 'game.html';
+                                }
+                            });      
                         })
-                    }).then(() => {
-                        fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'playing'});
                     })
                 }
             }
