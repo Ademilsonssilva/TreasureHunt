@@ -6,18 +6,42 @@ $(document).ready(() => {
 
         id = target.prop('id');
 
-        console.log(id);
-
         if(target.hasClass('invite_player')) {
 
             fd.ref('invites/').push({
                 player: logged_user,
                 invited: target.attr('player_key'),
                 datetime: firebase.database.ServerValue.TIMESTAMP,
+                invite_status: 'pending',
             })
         }
         else if(target.hasClass('cancel_invite')) {
             fd.ref('invites/'+target.attr('invite_key')).set({});            
+        }
+        else if(target.hasClass('accept_invite')) {
+            player_id = '';
+            fd.ref('invites/'+target.attr('invite_key')).once('value', (response) => {
+                player_id = response.val().player;
+            }).then(() => {
+                fd.ref('status/'+player_id).once('value', (response) => {
+                    state = response.val().state;
+                }).then(() => {
+                    if(state == 'online') {
+                        fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'starting'});
+                    }
+                    else {
+                        fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'playing'});
+                    }
+                })
+            });
+
+            
+
+            //alert(player_id);
+            //
+        }
+        else if(target.hasClass('play_game')) {
+            swal('wow', 'Let the games begin', 'success');
         }
     });
 
@@ -64,11 +88,13 @@ $(document).ready(() => {
 
     })
 
-    fd.ref('invites/').on('value', (response) => {
+    fd.ref('invites/').orderByChild('invite_status').startAt('pending').endAt('starting').on('value', (response) => {
 
         cleanButtons();
 
         response.forEach((invite) => {
+
+            invite_status = '';
 
             if(invite.val().player == logged_user) {
                 invite_status = 'inviting';
@@ -78,6 +104,23 @@ $(document).ready(() => {
                 invite_status = 'invited';
                 target = $(`.btn_player_${invite.val().player}`);
             }
+            
+            if(invite_status != '') {
+                if(invite.val().invite_status == 'playing') {
+                    invite_status = 'play';
+                }
+                if(invite.val().invite_status == 'starting' && invite.val().player == logged_user)  {
+                    fd.ref('player/'+invite.val().invited).once('value', (response) => {
+                        swal({
+                            html: 'Oloco ' + response.val().name + ' aceitou!',
+                            type: 'success',
+                            title: 'Oloco meu',
+                        })
+                    }).then(() => {
+                        fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'playing'});
+                    })
+                }
+            }
 
             target.removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite');
             if(invite_status == 'inviting') {
@@ -86,8 +129,13 @@ $(document).ready(() => {
                 target.attr('invite_key', invite.key);
             }
             else if (invite_status == 'invited') {
-                target.html('Jogar');
+                target.html('Aceitar');
                 target.addClass('accept_invite');
+                target.attr('invite_key', invite.key);
+            }
+            else if( invite_status == 'play') {
+                target.html('Jogar');
+                target.addClass('play_game');
                 target.attr('invite_key', invite.key);
             }
         })
@@ -99,7 +147,7 @@ function cleanButtons()
 {
     jQuery('.invite_status').each(function () {
 
-        $(this).removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite');
+        $(this).removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite').removeClass('play_game');
         $(this).html('Convidar');
         $(this).addClass('invite_player');
         $(this).removeAttr('invite_key');

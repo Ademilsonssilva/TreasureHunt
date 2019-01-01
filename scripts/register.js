@@ -1,12 +1,36 @@
 $(document).ready(function () {
 
-    //$('#primary_color_div').html(getColorsSelector('primary_color'));
+    default_color_1 = avaliableColors[Math.floor(Math.random()*avaliableColors.length)];
+
+    passed = false;
+    while (!passed) {
+        default_color_2 = avaliableColors[Math.floor(Math.random()*avaliableColors.length)];
+
+        if(default_color_2 != default_color_1) {
+            passed = true;
+        }
+    }
+
+    $('#primary_color_div').html(getColorsSelector('primary_color', default_color_1));
+    $('#secondary_color_div').html(getColorsSelector('secondary_color'));
 
     $('#btn_register').on('click', function () {
 
         name = $('#name').val();
         email = $('#email').val();
         pass = $('#password').val();
+        primary_color = $('#primary_color').val();
+        secondary_color = $('#secondary_color').val();
+
+        if(primary_color == secondary_color) {
+            swal({
+                title: 'Ops',
+                html: 'As cores devem ser diferentes!',
+                type: 'warning',
+            })
+
+            return;
+        }
 
         if(email == '' || pass == '' || name == '') {
     
@@ -37,6 +61,8 @@ $(document).ready(function () {
             firebase.database().ref('player/' + uid ).set({
                 name: $('#name').val(),
                 email: email,
+                primary_color: primary_color,
+                secondary_color: secondary_color,
             });
             
     
