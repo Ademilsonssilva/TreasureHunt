@@ -25,10 +25,13 @@ $(document).ready(() => {
                 player_id = response.val().player;
                 invite_id = response.key;
 
+                treasures = randomizeTreasures();
+
                 fd.ref('games/'+target.attr('invite_key')).set({
                     player1: response.val().player,
                     player2: response.val().invited,
-                    gameStart: firebase.database.ServerValue.TIMESTAMP
+                    gameStart: firebase.database.ServerValue.TIMESTAMP,
+                    treasures: treasures,
                 });
 
             }).then(() => {

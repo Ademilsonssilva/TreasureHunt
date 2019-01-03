@@ -12,7 +12,7 @@ $(document).ready(function () {
     }
 
     $('#primary_color_div').html(getColorsSelector('primary_color', default_color_1));
-    $('#secondary_color_div').html(getColorsSelector('secondary_color'));
+    $('#secondary_color_div').html(getColorsSelector('secondary_color', default_color_2));
 
     $('#btn_register').on('click', function () {
 

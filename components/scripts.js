@@ -8,4 +8,5 @@ document.write(`
     <script src="scripts/connection.js"></script>
     <script src="scripts/session.js"></script>
     <script src="scripts/utils.js"></script>
+    <script src="scripts/game.class.js"></script>
 `);
