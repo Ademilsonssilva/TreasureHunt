@@ -1,6 +1,6 @@
 avaliableColors = [
     'red', 'blue', 'lightgreen', 'green', 'orange', 
-    'purple', 'brown', 'yellow', 'pink', 'gray',
+    'purple', 'brown', 'pink', 'gray',
 ];
 
 function getColorsSelector (id, defaultColor = null)
@@ -36,7 +36,6 @@ function translateColorName(color)
         case 'orange': return 'Laranja';
         case 'purple': return 'Roxo';
         case 'brown': return 'Marrom';
-        case 'yellow': return 'Amarelo';
         case 'pink': return 'Rosa';
         case 'gray': return 'Cinza';
     }

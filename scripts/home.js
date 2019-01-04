@@ -27,11 +27,14 @@ $(document).ready(() => {
 
                 treasures = randomizeTreasures();
 
+                next_player = Math.floor(Math.random()*2)
+
                 fd.ref('games/'+target.attr('invite_key')).set({
                     player1: response.val().player,
                     player2: response.val().invited,
                     gameStart: firebase.database.ServerValue.TIMESTAMP,
                     treasures: treasures,
+                    nextPlayer: next_player == 1 ? response.val().player : response.val().invited,
                 });
 
             }).then(() => {
@@ -133,7 +136,7 @@ $(document).ready(() => {
                         }).then( (result) => {
                             fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'playing'}).then(() => {
                                 if(result.value) {
-                                    localStorage.setItem('th_active_game', invite.val().id);
+                                    localStorage.setItem('th_active_game', invite.key);
                                     window.location.href = 'game.html';
                                 }
                             });      
