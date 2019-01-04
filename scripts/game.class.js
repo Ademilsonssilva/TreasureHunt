@@ -11,6 +11,7 @@ function TreasureHunt(game, player1, player2, playerKey)
         treasure_number: 15,
         board_side: 10,
         moves: null,
+        moves_array: null,
         configureGame: function () 
         {
             this.player1Color = player1.primary_color;

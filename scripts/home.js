@@ -8,20 +8,26 @@ $(document).ready(() => {
 
         if(target.hasClass('invite_player')) {
 
-            fd.ref('invites/').push({
+            invite_object = {
                 player: logged_user,
                 invited: target.attr('player_key'),
                 datetime: firebase.database.ServerValue.TIMESTAMP,
                 invite_status: 'pending',
-            })
+            }
+
+            fd.ref('player_invites/'+logged_user+'/invites/').push(invite_object).then((first_invite) => {
+                
+                fd.ref('player_invites/'+target.attr('player_key')+'/invites/'+first_invite.key).set(invite_object);
+            });
         }
         else if(target.hasClass('cancel_invite')) {
-            fd.ref('invites/'+target.attr('invite_key')).set({});            
+            fd.ref('player_invites/'+logged_user+'/invites/'+target.attr('invite_key')).set({});
+            fd.ref('player_invites/'+target.attr('player_key')+'/invites/'+target.attr('invite_key')).set({});         
         }
         else if(target.hasClass('accept_invite')) {
             player_id = '';
             invite_id = '';
-            fd.ref('invites/'+target.attr('invite_key')).once('value', (response) => {
+            fd.ref('player_invites/'+logged_user+'/invites/'+target.attr('invite_key')).once('value', (response) => {
                 player_id = response.val().player;
                 invite_id = response.key;
 
@@ -32,6 +38,7 @@ $(document).ready(() => {
                 fd.ref('games/'+target.attr('invite_key')).set({
                     player1: response.val().player,
                     player2: response.val().invited,
+                    gameStatus: 'playing',
                     gameStart: firebase.database.ServerValue.TIMESTAMP,
                     treasures: treasures,
                     nextPlayer: next_player == 1 ? response.val().player : response.val().invited,
@@ -42,14 +49,21 @@ $(document).ready(() => {
                     state = response.val().state;
                 }).then(() => {
                     if(state == 'online') {
-                        fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'starting'});
+                        fd.ref('player_invites/'+logged_user+'/invites/'+target.attr('invite_key')).update({invite_status: 'starting'}).then(() => {
+                            fd.ref('player_invites/'+target.attr('player_key')+'/invites/'+target.attr('invite_key')).update({invite_status: 'starting'}).then(() => {
+                                localStorage.setItem('th_active_game', invite_id);
+                                window.location.href = 'game.html';
+                            });
+                        });
                     }
                     else {
-                        fd.ref('invites/'+target.attr('invite_key')).update({invite_status: 'playing'});
+                        fd.ref('player_invites/'+logged_user+'/invites/'+target.attr('invite_key')).update({invite_status: 'playing'}).then(() => {
+                            fd.ref('player_invites/'+target.attr('player_key')+'/invites/'+target.attr('invite_key')).update({invite_status: 'playing'}).then(() => {
+                                localStorage.setItem('th_active_game', invite_id);
+                                window.location.href = 'game.html';
+                            });
+                        });
                     }
-                }).then(() => {
-                    localStorage.setItem('th_active_game', invite_id);
-                    window.location.href = 'game.html';
                 })
             });
 
@@ -90,8 +104,8 @@ $(document).ready(() => {
         })
     })
         
-    fd.ref('status/').on('value', (status) => {
-
+    fd.ref('status/').once('value', function (status) {
+        //playerState = status;
         status.forEach((playerState) => {
             spanstate = $(`.status-${playerState.key}`);
 
@@ -102,13 +116,95 @@ $(document).ready(() => {
             spanstate.html(state).css('color', color);
         });
 
+    }).then(() => {
+        fd.ref('status/').on('child_changed', function (status) {
+            playerState = status;
+            //status.forEach((playerState) => {
+                spanstate = $(`.status-${playerState.key}`);
+    
+                state = playerState.val().state;
+    
+                color = state == 'online' ? 'green' : 'red';
+    
+                spanstate.html(state).css('color', color);
+            //});
+    
+        })
+    }).then(function () {
+
+        fd.ref('player_invites/'+logged_user+'/invites/').on('value', (response) => {
+
+            cleanButtons();
+    
+            response.forEach((invite) => {
+    
+                invite_status = '';
+    
+                if(invite.val().player == logged_user) {
+                    invite_status = 'inviting';
+                    target = $(`.btn_player_${invite.val().invited}`);
+                }
+                else if (invite.val().invited == logged_user) {
+                    invite_status = 'invited';
+                    target = $(`.btn_player_${invite.val().player}`);
+                }
+                
+                if(invite_status != '') {
+                    if(invite.val().invite_status == 'playing') {
+                        invite_status = 'play';
+                    }
+                    if(invite.val().invite_status == 'starting' && invite.val().player == logged_user)  {
+                        fd.ref('player/'+invite.val().invited).once('value', (response) => {
+                            swal({
+                                html: response.val().name + ' aceitou o convite! Ir para o jogo?',
+                                type: 'success',
+                                showCancelButton: true,
+                                confirmButtonText: 'Ir',
+                                cancelButtonText: 'Ficar',
+                            }).then( (result) => {
+                                fd.ref('player_invites/'+logged_user+'/invites/'+target.attr('invite_key')).update({invite_status: 'playing'}).then(() => {
+                                    fd.ref('player_invites/'+invite.val().invited+'/invites/'+target.attr('invite_key')).update({invite_status: 'playing'}).then(() => {
+                                        if(result.value) {
+                                            localStorage.setItem('th_active_game', invite.key);
+                                            window.location.href = 'game.html';
+                                        }
+                                    })
+                                });      
+                            })
+                        })
+                    }
+                }
+    
+                target.removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite');
+                if(invite_status == 'inviting') {
+                    target.html('Cancelar');
+                    target.addClass('cancel_invite');
+                    target.attr('invite_key', invite.key);
+                }
+                else if (invite_status == 'invited') {
+                    target.html('Aceitar');
+                    target.addClass('accept_invite');
+                    target.attr('invite_key', invite.key);
+                }
+                else if( invite_status == 'play') {
+                    target.html('Jogar');
+                    target.addClass('play_game');
+                    target.attr('invite_key', invite.key);
+                }
+            })
+        })
+
     })
 
-    fd.ref('invites/').orderByChild('invite_status').startAt('pending').endAt('starting').on('value', (response) => {
+    /*fd.ref('player_invites/'+logged_user+'/invites/').on('value', (response) => {
 
         cleanButtons();
 
+        console.log(response.val())
+
         response.forEach((invite) => {
+
+            console.log(invite);
 
             invite_status = '';
 
@@ -162,7 +258,7 @@ $(document).ready(() => {
                 target.attr('invite_key', invite.key);
             }
         })
-    })
+    })*/
     
 });
 
