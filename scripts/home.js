@@ -40,6 +40,7 @@ $(document).ready(() => {
                     player2: response.val().invited,
                     gameStatus: 'playing',
                     gameStart: firebase.database.ServerValue.TIMESTAMP,
+                    winner: null,
                     treasures: treasures,
                     nextPlayer: next_player == 1 ? response.val().player : response.val().invited,
                 });

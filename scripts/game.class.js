@@ -21,6 +21,14 @@ function TreasureHunt(game, player1, player2, playerKey)
         {
             return (playerKey == this.player1Key ? this.player1Color : this.player2Color);
         },
+        playerScore: function (playerKey)
+        {
+            return (playerKey == this.player1Key ? this.player1Score : this.player2Score);
+        },
+        getPlayer: function (playerKey) 
+        {
+            return (playerKey == this.player1Key ? this.player1 : this.player2);
+        },
         buildBoard: function () {
 
             table = $('<table class="game-table"></table>');
@@ -85,6 +93,15 @@ function TreasureHunt(game, player1, player2, playerKey)
         setNextPlayer: function (next) 
         {
             this.game.nextPlayer = next;
+            if(this.game.winner != null) {
+                $('#move_details').html('O jogo terminou! O vencedor é '+ this.getPlayer(this.game.winner).name);
+                $('#move_details').css('color', this.playerColor(this.game.winner));
+                $('#move_details').append(`<br><a class="btn btn-sm btn-primary" href="home.html">Voltar</a>`);
+            }
+            if(next != null) {
+                $('#move_details').html('Vez de '+ this.getPlayer(next).name);
+                $('#move_details').css('color', this.playerColor(next));
+            }
         },
         translatePosition: function (pos) 
         {
@@ -99,6 +116,11 @@ function TreasureHunt(game, player1, player2, playerKey)
         jqToDbPosition: function (x, y) 
         {
             return (parseInt(x-1)*10) + parseInt(y);
+        },
+        updateScores: function () 
+        {
+            $('#player_1_status').html(th.player1Score + ' acertos');
+            $('#player_2_status').html(th.player2Score + ' acertos');
         },
         translateDBPosition: function (pos)
         {

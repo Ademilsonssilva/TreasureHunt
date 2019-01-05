@@ -50,9 +50,15 @@ $(document).ready(function () {
 
                 th = TreasureHunt(active_game, player1, player2, logged_user);
                 th.configureGame();
+                th.player1Score = 0;
+                th.player2Score = 0;
     
                 fd.ref('games/'+active_game_key+'/nextPlayer').on('value', (data) => {
                     th.setNextPlayer(data.val());
+                })
+
+                fd.ref('games/'+active_game_key+'/winner').on('value', (data) => {
+                    th.game.winner = data.val();
                 })
     
                 fd.ref('games/'+active_game_key+'/moves').on('child_added', (data) => {
@@ -62,9 +68,41 @@ $(document).ready(function () {
                         loaded_moves_array.push(data.val().position);
 
                         th.moves = loaded_moves;
-                        th.moves_array = loaded_moves_array
+                        th.moves_array = loaded_moves_array;
 
-                        th.populateBoard()
+                        th.populateBoard();
+                    }
+
+                    if(th.game.treasures.includes(data.val().position)) {
+                        if(data.val().player == th.player1Key) {
+                            th.player1Score++;
+                        }
+                        else {
+                            th.player2Score++;
+                        }
+
+                        th.updateScores();
+                    }
+                    if(th.playerScore(data.val().player) > 7) {
+
+                        setTimeout(function () {
+                            if(data.val().player == logged_user) {
+                                swal({
+                                    text: 'Você venceu esta partida!',
+                                    type: 'success',
+                                    title: 'Vitória',
+                                })
+                            }
+                            else {
+                                swal({
+                                    text: 'Você perdeu esta partida!',
+                                    type: 'error',
+                                    title: 'Derrota',
+                                })
+                            }
+                        }, 1000);
+                        
+                        
                     }
                 })
         
@@ -97,13 +135,39 @@ $(document).ready(function () {
                                     })
                                 }
                                 else {
-                                    th.nextPlayer = null
+                                    th.setNextPlayer(null);
+                                    
                                     swal({
                                         toast: true,
                                         position: 'top-end',
                                         text: 'acertou!',
                                         timer: 1200,
                                     })
+
+                                    if(th.playerScore(logged_user) > 7) {
+                                        fd.ref('games/'+active_game_key).update({
+                                            nextPlayer: null,
+                                            gameEnd: firebase.database.ServerValue.TIMESTAMP,
+                                            winner: logged_user,
+                                            gameStatus: 'finished',
+                                        }).then(function () {
+                                            fd.ref('player_invites/'+th.player1Key+'/invites/'+active_game_key).set({}).then(function () {
+                                                fd.ref('player_invites/'+th.player2Key+'/invites/'+active_game_key).set({}).then(function () {
+                                                    th.setNextPlayer(null);
+                                                    /*swal({
+                                                        text: 'Você venceu!',
+                                                        type: 'success',
+                                                        title: 'Vitória',
+                                                    }).then(function () {
+                                                        //window.location.href = 'home.html';
+                                                    })*/
+                                                })
+                                            })
+                                        })
+                                    }
+                                    else {
+                                        th.setNextPlayer(logged_user);
+                                    }
                                 }
                                 
                             })
@@ -114,6 +178,7 @@ $(document).ready(function () {
                         swal({
                             type: 'warning',
                             toast: true,
+                            position: 'top-end',
                             text: 'É vez do oponente jogar!',
                             timer: 1000,
                         })
