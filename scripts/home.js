@@ -20,10 +20,10 @@ $(document).ready(() => {
                 fd.ref('player_invites/'+target.attr('player_key')+'/invites/'+first_invite.key).set(invite_object);
             });
         }
-        else if(target.hasClass('cancel_invite')) {
+        /*else if(target.hasClass('already_invited')) {
             fd.ref('player_invites/'+logged_user+'/invites/'+target.attr('invite_key')).set({});
             fd.ref('player_invites/'+target.attr('player_key')+'/invites/'+target.attr('invite_key')).set({});         
-        }
+        }*/
         else if(target.hasClass('accept_invite')) {
             player_id = '';
             invite_id = '';
@@ -176,10 +176,10 @@ $(document).ready(() => {
                     }
                 }
     
-                target.removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite');
+                target.removeClass('invite_player').removeClass('accept_invite').removeClass('already_invited');
                 if(invite_status == 'inviting') {
-                    target.html('Cancelar');
-                    target.addClass('cancel_invite');
+                    target.html('Aguardando');
+                    target.addClass('already_invited');
                     target.attr('invite_key', invite.key);
                 }
                 else if (invite_status == 'invited') {
@@ -267,7 +267,7 @@ function cleanButtons()
 {
     jQuery('.invite_status').each(function () {
 
-        $(this).removeClass('invite_player').removeClass('accept_invite').removeClass('cancel_invite').removeClass('play_game');
+        $(this).removeClass('invite_player').removeClass('accept_invite').removeClass('already_invited').removeClass('play_game');
         $(this).html('Convidar');
         $(this).addClass('invite_player');
         $(this).removeAttr('invite_key');

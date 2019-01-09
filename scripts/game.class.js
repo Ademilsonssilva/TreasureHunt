@@ -81,8 +81,7 @@ function TreasureHunt(game, player1, player2, playerKey)
                 }
 
                 $('#'+table_position).html(move_result);
-                $('#'+table_position).css('color', this.playerColor(this.moves[i].player));
-                
+                $('#'+table_position).css('color', this.playerColor(this.moves[i].player));                
 
             }
         },

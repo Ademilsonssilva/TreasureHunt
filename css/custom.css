@@ -63,3 +63,18 @@
 .game-cell {
     font-weight: bold;
 }
+
+.already_invited{
+    background-color: orange !important;
+    border-color: orange !important;
+}
+
+.invite_player{
+    background-color: #81BEF7 !important;
+    border-color: #81BEF7 !important;
+}
+
+.accept_invite {
+    background-color: #FE2E64 !important;
+    border-color: #FE2E64 !important;
+}

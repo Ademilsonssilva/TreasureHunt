@@ -100,6 +100,7 @@ $(document).ready(function () {
                                     title: 'Derrota',
                                 })
                             }
+                            th.setNextPlayer();
                         }, 1000);
                         
                         
