@@ -80,6 +80,11 @@ function TreasureHunt(game, player1, player2, playerKey)
                     }
                 }
 
+                if(i == this.moves.length-1) {
+                    $('.last_move').removeClass('last_move');
+                    $('#'+table_position).addClass('last_move');
+                }
+
                 $('#'+table_position).html(move_result);
                 $('#'+table_position).css('color', this.playerColor(this.moves[i].player));                
 
@@ -157,11 +162,15 @@ function TreasureHunt(game, player1, player2, playerKey)
 
                 near_treasures = 0;
 
+                $('.last_move_neighborhood').removeClass('last_move_neighborhood');
+
                 for(j = min_x; j <= max_x; j++) {
 
                     for(k = min_y; k <= max_y; k++) {
 
                         verified_position = this.jqToDbPosition(j, k);
+
+                        $('#'+this.translateDBPosition(verified_position)).addClass('last_move_neighborhood');
 
                         if(this.game.treasures.includes(verified_position)) {
                             near_treasures++;
