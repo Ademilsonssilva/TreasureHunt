@@ -141,48 +141,69 @@ function TreasureHunt(game, player1, player2, playerKey)
         },
         verifyMoveResult: function (position) 
         {
+            
+            neighbors = this.getPositionNeighborhood(position);
+
             if(this.game.treasures.includes(position)) {
-                return 'hit';
-            }
-            else {
-                if(position % 10 != 0){
-                    x = parseInt(Math.trunc(position / 10))+1;
-                    y = position % 10;
-                }
-                else {
-                    x = parseInt(Math.trunc(position / 10));
-                    y = 10;
-                }
-
-                min_x = x > 2 ? x-2 : 1;
-                max_x = x < 9 ? x+2 : 10;
-
-                min_y = y > 2 ? y-2 : 1;
-                max_y = y < 9 ? y+2 : 10;
-
-                near_treasures = 0;
-
                 $('.last_move_neighborhood').removeClass('last_move_neighborhood');
 
-                for(j = min_x; j <= max_x; j++) {
+                for(ne = 0; ne < neighbors.length; ne++) {
+                    $('#'+this.translateDBPosition(neighbors[ne])).addClass('last_move_neighborhood');
+                }
 
-                    for(k = min_y; k <= max_y; k++) {
+                return 'hit';
 
-                        verified_position = this.jqToDbPosition(j, k);
+            }
 
-                        $('#'+this.translateDBPosition(verified_position)).addClass('last_move_neighborhood');
+            near_treasures = 0;
 
-                        if(this.game.treasures.includes(verified_position)) {
-                            near_treasures++;
-                        }
-                    }
+            $('.last_move_neighborhood').removeClass('last_move_neighborhood');
+
+            for(ne = 0; ne < neighbors.length; ne++) {
+
+                verified_position = neighbors[ne];
+
+                $('#'+this.translateDBPosition(verified_position)).addClass('last_move_neighborhood');
+
+                if(this.game.treasures.includes(verified_position)) {
+                    near_treasures++;
+                }
+
+            }    
+
+            return near_treasures;
+        
+        },
+        getPositionNeighborhood: function (position) 
+        {
+            if(position % 10 != 0){
+                x = parseInt(Math.trunc(position / 10))+1;
+                y = position % 10;
+            }
+            else {
+                x = parseInt(Math.trunc(position / 10));
+                y = 10;
+            }
+
+            min_x = x > 2 ? x-2 : 1;
+            max_x = x < 9 ? x+2 : 10;
+
+            min_y = y > 2 ? y-2 : 1;
+            max_y = y < 9 ? y+2 : 10;
+
+            neighbors = [];
+
+            for(j = min_x; j <= max_x; j++) {
+
+                for(k = min_y; k <= max_y; k++) {
+
+                    neighbors.push(this.jqToDbPosition(j, k));
 
                 }
 
-                //console.log(`${min_x} - ${max_x} - ${min_y} - ${max_y}`);
-
-                return near_treasures;
             }
+
+            return neighbors;
         },
         getOpponentKey: function () 
         {

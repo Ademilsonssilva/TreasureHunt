@@ -115,7 +115,13 @@ $(document).ready(function () {
                 th.populateBoard();
         
                 $(document).on('click', '.game-cell', function (clicked) {
+
                     td = $(clicked.currentTarget);
+                    clearInterval(timeOut);
+
+                    if(td.hasClass('holding')) {
+                        return false;
+                    }
         
                     if(th.getNextPlayer() == logged_user) {
                         position = th.translatePosition(td);
@@ -185,7 +191,47 @@ $(document).ready(function () {
                         })
                     }
         
-                })
+                }) 
+                
+                $(document).on('mousedown touchstart', '.game-cell', function(e) {
+                    
+                    $('.holding').removeClass('holding');
+                    counter = 0;
+                    timeout = 0;
+                    try {
+                        clearInterval(timeOut);
+                    }
+                    catch(e){}
+                    
+                    timeOut = setInterval(function(){
+                        counter++;
+
+                        if(counter == 7 ) {
+                            if($(e.currentTarget).hasClass('highlighted_position_selected')) {
+                                clearInterval(timeOut);
+        
+                                $('.highlighted_position').removeClass('highlighted_position');
+                                $('.highlighted_position_selected').removeClass('highlighted_position_selected');
+
+                                $(e.currentTarget).addClass('holding');
+                                return false;
+                            }
+                        }
+
+                        if(counter == 12) {
+                            
+                            $('.highlighted_position').removeClass('highlighted_position');
+                            $('.highlighted_position_selected').removeClass('highlighted_position_selected');
+                            $(e.currentTarget).addClass('highlighted_position_selected');
+                            neighbors = th.getPositionNeighborhood(th.translatePosition($(e.currentTarget)));
+
+                            for(nb = 0; nb < neighbors.length; nb++) {
+                                $('#' + th.translateDBPosition(neighbors[nb])).addClass('highlighted_position');
+                            }
+                            $(e.currentTarget).addClass('holding');
+                        }
+                    }, 100);
+                });
         
             });
         })

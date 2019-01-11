@@ -83,6 +83,14 @@
     background-color: #E8E8E8 !important;
 }
 
+.highlighted_position {
+    background-color: #C6E2FF !important;
+}
+
+.highlighted_position_selected {
+    background-color: #B9D3EE !important;
+}
+
 .last_move {
     background-color: #D8D8D8 !important;
 }
