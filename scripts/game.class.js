@@ -39,7 +39,7 @@ function TreasureHunt(game, player1, player2, playerKey)
 
 				for (var y = 1; y <= this.board_side; y++) {
 
-					td = $(`<td id="${x}-${y}" class="game-cell" x="${x}" y="${y}">&nbsp;</td>`);
+					td = $(`<td id="${x}-${y}" class="game-cell" x="${x}" y="${y}"></td>`);
 
 					tr.append(td);
 
