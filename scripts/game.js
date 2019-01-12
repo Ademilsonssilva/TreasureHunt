@@ -50,6 +50,14 @@ $(document).ready(function () {
 
                 th = TreasureHunt(active_game, player1, player2, logged_user);
                 th.configureGame();
+
+                $(window).resize(function () {
+                    try{
+                        th.adjustScreenSize();
+                    }
+                    catch {}
+                })
+
                 th.player1Score = 0;
                 th.player2Score = 0;
     

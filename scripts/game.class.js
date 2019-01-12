@@ -39,7 +39,7 @@ function TreasureHunt(game, player1, player2, playerKey)
 
 				for (var y = 1; y <= this.board_side; y++) {
 
-					td = $(`<td id="${x}-${y}" class="game-cell noselect" x="${x}" y="${y}">&nbsp;</td>`);
+					td = $(`<td id="${x}-${y}" class="game-cell center noselect" x="${x}" y="${y}">&nbsp;</td>`);
 
 					tr.append(td);
 
@@ -49,15 +49,33 @@ function TreasureHunt(game, player1, player2, playerKey)
 
             }
             
-            $('#game_div').append(table);
+            $('#game_div').append($('<center ></center>').append(table));
 
-            width = $('.game-table').width();
-
-            height = $('.game-table').height();
-
-            $('.game-table').height(width);
+            this.adjustScreenSize();
 
             td_width = $('.game-cell').width();
+
+        },
+
+        adjustScreenSize: function () 
+        {
+
+            window_width = $(window).width();
+            window_height = $(window).height();
+
+            if(window_width > window_height) {
+                table_size = window_height * 0.75;
+            }
+            else {
+                table_size = window_width * 0.9;
+            }
+
+            $('.game-table').height(table_size);
+            $('.game-table').width(table_size);
+
+            cell_size = $('.game-cell').first().width();
+            $('.game-table').css('font-size', cell_size* 0.5);
+            
 
         },
         populateBoard: function () 
