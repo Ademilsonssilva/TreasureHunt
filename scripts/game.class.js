@@ -1,3 +1,13 @@
+// const TABLE_SIZE = 100; 
+// const TREASURE_NUMBER = 15; 
+// const BOARD_SIDE = 10;
+// const TIP_SIZE = 2;
+
+const TABLE_SIZE = 25; 
+const TREASURE_NUMBER = 5; 
+const BOARD_SIDE = 5;
+const TIP_SIZE = 1;
+
 function TreasureHunt(game, player1, player2, playerKey)
 {
     return {
@@ -7,9 +17,10 @@ function TreasureHunt(game, player1, player2, playerKey)
         player2Key: game.player2,
         player2: player2,
         myKey: playerKey,
-        table_size: 15,
-        treasure_number: 15,
-        board_side: 10,
+        table_size: TABLE_SIZE,
+        tip_size: TIP_SIZE,
+        treasure_number: TREASURE_NUMBER,
+        board_side: BOARD_SIDE,
         moves: null,
         moves_array: null,
         configureGame: function () 
@@ -137,7 +148,7 @@ function TreasureHunt(game, player1, player2, playerKey)
         },
         jqToDbPosition: function (x, y) 
         {
-            return (parseInt(x-1)*10) + parseInt(y);
+            return (parseInt(x-1)* this.board_side ) + parseInt(y);
         },
         updateScores: function () 
         {
@@ -146,13 +157,13 @@ function TreasureHunt(game, player1, player2, playerKey)
         },
         translateDBPosition: function (pos)
         {
-            if(pos % 10 != 0){
-                first = parseInt(Math.trunc(pos / 10))+1;
-                second = pos % 10;
+            if(pos % this.board_side != 0){
+                first = parseInt(Math.trunc(pos / this.board_side))+1;
+                second = pos % this.board_side;
             }
             else {
-                first = parseInt(Math.trunc(pos / 10));
-                second = 10;
+                first = parseInt(Math.trunc(pos / this.board_side));
+                second = this.board_side;
             }
 
             return `${first}-${second}`;
@@ -194,20 +205,20 @@ function TreasureHunt(game, player1, player2, playerKey)
         },
         getPositionNeighborhood: function (position) 
         {
-            if(position % 10 != 0){
-                x = parseInt(Math.trunc(position / 10))+1;
-                y = position % 10;
+            if(position % this.board_side != 0){
+                x = parseInt(Math.trunc(position / this.board_side))+1;
+                y = position % this.board_side;
             }
             else {
-                x = parseInt(Math.trunc(position / 10));
-                y = 10;
+                x = parseInt(Math.trunc(position / this.board_side));
+                y = this.board_side;
             }
 
-            min_x = x > 2 ? x-2 : 1;
-            max_x = x < 9 ? x+2 : 10;
+            min_x = x > this.tip_size ? x - this.tip_size : 1;
+            max_x = x < this.board_side - 1 ? x + this.tip_size : this.board_side;
 
-            min_y = y > 2 ? y-2 : 1;
-            max_y = y < 9 ? y+2 : 10;
+            min_y = y > this.tip_size ? y - this.tip_size : 1;
+            max_y = y < this.board_side - 1 ? y + this.tip_size : this.board_side;
 
             neighbors = [];
 

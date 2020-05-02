@@ -31,7 +31,7 @@ $(document).ready(() => {
                 player_id = response.val().player;
                 invite_id = response.key;
 
-                treasures = randomizeTreasures();
+                treasures = randomizeTreasures(TABLE_SIZE, TREASURE_NUMBER);
 
                 next_player = Math.floor(Math.random()*2)
 

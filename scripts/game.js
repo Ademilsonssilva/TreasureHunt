@@ -91,7 +91,7 @@ $(document).ready(function () {
 
                         th.updateScores();
                     }
-                    if(th.playerScore(data.val().player) > 7) {
+                    if(th.playerScore(data.val().player) > parseInt(TREASURE_NUMBER / 2) ) {
 
                         setTimeout(function () {
                             if(data.val().player == logged_user) {
@@ -159,7 +159,7 @@ $(document).ready(function () {
                                         timer: 1200,
                                     })
 
-                                    if(th.playerScore(logged_user) > 7) {
+                                    if(th.playerScore(logged_user) > parseInt(TREASURE_NUMBER / 2)) {
                                         fd.ref('games/'+active_game_key).update({
                                             nextPlayer: null,
                                             gameEnd: firebase.database.ServerValue.TIMESTAMP,
