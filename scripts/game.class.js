@@ -1,12 +1,12 @@
-// const TABLE_SIZE = 100; 
-// const TREASURE_NUMBER = 15; 
-// const BOARD_SIDE = 10;
-// const TIP_SIZE = 2;
+const TABLE_SIZE = 100; 
+const TREASURE_NUMBER = 15; 
+const BOARD_SIDE = 10;
+const TIP_SIZE = 2;
 
-const TABLE_SIZE = 25; 
-const TREASURE_NUMBER = 5; 
-const BOARD_SIDE = 5;
-const TIP_SIZE = 1;
+// const TABLE_SIZE = 25; 
+// const TREASURE_NUMBER = 5; 
+// const BOARD_SIDE = 5;
+// const TIP_SIZE = 1;
 
 function TreasureHunt(game, player1, player2, playerKey)
 {
